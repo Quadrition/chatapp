@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "494655463104",
+    "firebase_url": "https://binple-chat-app.firebaseio.com",
+    "project_id": "binple-chat-app",
+    "storage_bucket": "binple-chat-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:494655463104:android:322f4dcd43b1f5fe8d9725",
+        "android_client_info": {
+          "package_name": "com.binple.chatapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "494655463104-iltdjnav7gaqansrqod7pl8tcb9tba5m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.binple.chatapp",
+            "certificate_hash": "13faeba7144e97046eb0e202b501df86cf61c8d0"
+          }
+        },
+        {
+          "client_id": "494655463104-pf5hahmvdu9sgkdh79upl9npcpf5f54g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApCR_qYzRZRb_8bDhyHSCodAK4bntwo4Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "494655463104-pf5hahmvdu9sgkdh79upl9npcpf5f54g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

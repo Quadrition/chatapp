@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>494655463104-uj11nkgtgb30s7va4tavrt7jcv00krfp.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.494655463104-uj11nkgtgb30s7va4tavrt7jcv00krfp</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>494655463104-iltdjnav7gaqansrqod7pl8tcb9tba5m.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBxonNu45XOc07kLqTfLpcf92Q_vFh6RG8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>494655463104</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.binple.chatapp</string>
+	<key>PROJECT_ID</key>
+	<string>binple-chat-app</string>
+	<key>STORAGE_BUCKET</key>
+	<string>binple-chat-app.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:494655463104:ios:e3f60d5a583464098d9725</string>
+	<key>DATABASE_URL</key>
+	<string>https://binple-chat-app.firebaseio.com</string>
+</dict>
+</plist>

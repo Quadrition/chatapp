@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'services/app_settings.dart';
+import 'registration_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -45,6 +47,31 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+
+  @override
+  void initState() {
+    debugPrint("main init state");
+    super.initState();
+    checkFirstRun();
+  }
+
+  checkFirstRun() async {
+    debugPrint("check first run started");
+    var instance = await AppSettingsService.getInstance();
+    bool _firstRun = instance.isFirstRun;
+    debugPrint("first run value is: " + _firstRun.toString());
+    if (_firstRun) {
+      debugPrint("first run");
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => RegistrationScreen()),
+      );
+
+    } else {
+      debugPrint("not first run");
+      //TODO navigate to main screen
+    }
+  }
 
   void _incrementCounter() {
     setState(() {
@@ -108,4 +135,8 @@ class _MyHomePageState extends State<MyHomePage> {
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+
+  //checks whether the user has already been registered or not and opens an appropriate screen
+
+
 }

@@ -1,0 +1,139 @@
+import 'package:flutter/material.dart';
+
+/// App Colors Class - Resource class for storing app level color constants
+class AppColors {
+
+  //main colors
+  static const Color _ORANGE_COLOR = Color(0xffff680d);
+  static const Color _BLUE_NAVY_COLOR = Color(0xff1957b7);
+  static const Color _LIGHT_GREY_COLOR = Color(0xfff5f5f5);
+  static const Color _WHITE_COLOR = Color(0xffffffff);
+  static const Color _RED_COLOR = Color(0xffed1c24);
+  static const Color _BLUE_LIGHT_COLOR = Color(0xffbed6fa);
+  static const Color _GREY_COLOR = Color(0xff434343);
+  static const Color _BLUE_BACKGROUND_COLOR = Color(0xff3061ae);
+  static const Color _GREY_BLUE_COLOR = Color(0xffebf0f7);
+  static const Color _BLUE_LIGHT2_COLOR = Color(0xffa0c5ff);
+  static const Color _GREY_DARK_COLOR = Color(0xff4f4949);
+  static const Color _GREY_DARK2_COLOR = Color(0xff535151);
+  static const Color _BLUE_NAVY2_COLOR = Color(0xff183057);
+  static const Color _GREY2_COLOR = Color(0xff626161);
+  static const Color _GREEN_COLOR = Color(0xff6ac259);
+  static const Color _GREEN2_COLOR = Color(0xff6dd07d);
+  static const Color _BLACK_COLOR = Color(0xff171717);
+  static const Color _GREY3_COLOR = Color(0xff4d4d4d);
+  static const Color _GREY_LIGHT_COLOR = Color(0xff8b8b8b);
+  static const Color _GREY_LIGHT2_COLOR = Color(0xff797979);
+  static const Color _GREY_DARK3_COLOR = Color(0xff525252);
+  static const Color _GREY_LIGHT3_COLOR = Color(0xff929090);
+  static const Color _GREY_LIGHT4_COLOR = Color(0xff656565);
+  static const Color _GREY_LIGHT5_COLOR = Color(0xfff0ebeb);
+
+
+
+  //colors of individual items
+
+  //main screen
+  static const Color MAIN_BACKGROUND_COLOR = _LIGHT_GREY_COLOR;
+  static const Color APP_BAR_BACKGROUND_COLOR = _BLUE_NAVY_COLOR;
+  static const Color NAVIGATION_DRAWER_COLOR = _BLUE_LIGHT_COLOR;
+  static const Color NAVIGATION_LAST_SYNC_COLOR = _GREY_COLOR;
+
+  //buttons
+  static const Color BUTTON_BORDER_COLOR = _ORANGE_COLOR;
+  static const Color BUTTON_BACKGROUND_COLOR = _WHITE_COLOR;
+  static const Color BUTTON_CIRCLE_COLOR = _RED_COLOR;
+
+  //login and registration screens
+  static const Color LOGIN_BACKGROUND_COLOR = _BLUE_BACKGROUND_COLOR;
+  static const Color LOGIN_BUTTON_COLOR = _GREY_BLUE_COLOR;
+  static const Color LOGIN_TEXT_COLOR = _WHITE_COLOR;
+  static const Color LOGIN_SIGN_UP_TEXT_COLOR = _ORANGE_COLOR;
+  static const Color LOGIN_ICON_COLOR = _BLUE_LIGHT2_COLOR;
+  static const Color FORGET_PASSWORD_TITTLE_COLOR = _GREY_DARK_COLOR;
+  static const Color FORGET_PASSWORD_TEXT_COLOR = _GREY_DARK2_COLOR;
+  static const Color FORGET_PASSWORD_BUTTON_COLOR = _BLUE_NAVY2_COLOR;
+  static const Color FORGET_PASSWORD_BUTTON_SPLASH_COLOR = _GREY2_COLOR;
+  static const Color FORGET_PASSWORD_BUTTON_TEXT_COLOR = _WHITE_COLOR;
+
+  //error dialog
+  static const Color ERROR_DIALOG_TITTLE_COLOR = FORGET_PASSWORD_TITTLE_COLOR;
+  static const Color ERROR_DIALOG_TEXT_COLOR = FORGET_PASSWORD_TEXT_COLOR;
+  static const Color ERROR_DIALOG_BUTTON_COLOR = FORGET_PASSWORD_BUTTON_COLOR;
+  static const Color ERROR_DIALOG_BUTTON_SPLASH_COLOR = FORGET_PASSWORD_BUTTON_SPLASH_COLOR;
+  static const Color ERROR_DIALOG_BUTTON_TEXT_COLOR = FORGET_PASSWORD_BUTTON_TEXT_COLOR;
+  static const Color ERROR_DIALOG_ICON_COLOR = FORGET_PASSWORD_BUTTON_COLOR;
+  static const Color ERROR_DIALOG_BLUE_COLOR = _BLUE_NAVY_COLOR;
+
+  //news tile
+  static const Color NEWS_TILE_BACKGROUND_COLOR = _WHITE_COLOR;
+  static const Color NEWS_TILE_READ_ICON_COLOR = _GREEN_COLOR;
+  static const Color NEWS_TILE_DOWNLOAD_ICON_COLOR = _BLUE_NAVY_COLOR;
+  static const Color NEWS_TILE_COMPANY_UNREAD_TEXT_COLOR = _BLACK_COLOR;
+  static const Color NEWS_TILE_DESCRIPTION_UNREAD_TEXT_COLOR = _GREY3_COLOR;
+  static const Color NEWS_TILE_COMPANY_READ_TEXT_COLOR = _GREY_LIGHT_COLOR;
+  static const Color NEWS_TILE_DESCRIPTION_READ_TEXT_COLOR = _GREY_LIGHT2_COLOR;
+
+  //news tile
+  static const Color DEADLINE_TILE_BACKGROUND_COLOR = NEWS_TILE_BACKGROUND_COLOR;
+  static const Color DEADLINE_TILE_READ_ICON_COLOR = NEWS_TILE_READ_ICON_COLOR;
+  static const Color DEADLINE_TILE_COMPANY_UNREAD_TEXT_COLOR = NEWS_TILE_COMPANY_UNREAD_TEXT_COLOR;
+  static const Color DEADLINE_TILE_DESCRIPTION_UNREAD_TEXT_COLOR = NEWS_TILE_DESCRIPTION_UNREAD_TEXT_COLOR;
+  static const Color DEADLINE_TILE_COMPANY_READ_TEXT_COLOR = NEWS_TILE_COMPANY_READ_TEXT_COLOR;
+  static const Color DEADLINE_TILE_DESCRIPTION_READ_TEXT_COLOR = NEWS_TILE_DESCRIPTION_READ_TEXT_COLOR;
+
+  //document tile
+  static const Color DOCUMENT_TILE_BACKGROUND_COLOR = NEWS_TILE_BACKGROUND_COLOR;
+  static const Color DOCUMENT_TILE_READ_ICON_COLOR = NEWS_TILE_READ_ICON_COLOR;
+  static const Color DOCUMENT_TILE_DOWNLOAD_ICON_COLOR = NEWS_TILE_DOWNLOAD_ICON_COLOR;
+  static const Color DOCUMENT_TILE_COMPANY_UNREAD_TEXT_COLOR = NEWS_TILE_COMPANY_UNREAD_TEXT_COLOR;
+  static const Color DOCUMENT_TILE_DESCRIPTION_UNREAD_TEXT_COLOR = NEWS_TILE_DESCRIPTION_UNREAD_TEXT_COLOR;
+  static const Color DOCUMENT_TILE_COMPANY_READ_TEXT_COLOR = NEWS_TILE_COMPANY_READ_TEXT_COLOR;
+  static const Color DOCUMENT_TILE_DESCRIPTION_READ_TEXT_COLOR = NEWS_TILE_DESCRIPTION_READ_TEXT_COLOR;
+
+  //subject tile
+  static const Color SUBJECT_TILE_BACKGROUND_COLOR = NEWS_TILE_BACKGROUND_COLOR;
+  static const Color SUBJECT_TILE_DELETE_ICON_COLOR = _RED_COLOR;
+  static const Color SUBJECT_TILE_COMPANY_UNREAD_TEXT_COLOR = NEWS_TILE_COMPANY_UNREAD_TEXT_COLOR;
+  static const Color SUBJECT_TILE_DESCRIPTION_UNREAD_TEXT_COLOR = NEWS_TILE_DESCRIPTION_UNREAD_TEXT_COLOR;
+
+  //floating action button
+  static const Color FAB_BACKGROUND_COLOR = _BLUE_NAVY_COLOR;
+  static const Color FAB_ICON_COLOR = _LIGHT_GREY_COLOR;
+
+  //add subject
+  static const Color ADD_SUBJECT_BUTTON_COLOR = _BLUE_NAVY_COLOR;
+  static const Color ADD_SUBJECT_BUTTON_TEXT_COLOR = _WHITE_COLOR;
+  static const Color ADD_SUBJECT_HINT_TEXT_COLOR = NEWS_TILE_COMPANY_READ_TEXT_COLOR;
+
+
+  //court tile
+  static const Color COURT_TILE_BACKGROUND_COLOR = NEWS_TILE_BACKGROUND_COLOR;
+  static const Color COURT_TILE_COURT_TEXT_COLOR = _ORANGE_COLOR;
+  static const Color COURT_TILE_TEXT_DARK_COLOR = _GREY_DARK3_COLOR;
+  static const Color COURT_TILE_TEXT_LIGHT_COLOR = _GREY_LIGHT3_COLOR;
+
+  //court process tile
+  static const Color COURT_PROCESS_TILE_BACKGROUND_COLOR = NEWS_TILE_BACKGROUND_COLOR;
+  static const Color COURT_PROCESS_TILE_CIRCLE_COLOR = _ORANGE_COLOR;
+  static const Color COURT_PROCESS_TILE_COURT_TEXT_COLOR = _BLACK_COLOR;
+  static const Color COURT_PROCESS_TILE_TEXT_DARK_COLOR = _GREY_DARK3_COLOR;
+  static const Color COURT_PROCESS_TILE_TEXT_LIGHT_COLOR = _GREY_LIGHT4_COLOR;
+
+  //settings screen
+  static const Color SETTINGS_SWITCH_BACKGROUND_COLOR = _WHITE_COLOR;
+  static const Color SETTINGS_SWITCH_ON_COLOR = _GREEN2_COLOR;
+  static const Color SETTINGS_SWITCH_ON_CIRCLE_COLOR = _GREY_LIGHT5_COLOR;
+  static const Color SETTINGS_SLIDER_ACTIVE_COLOR = _BLUE_NAVY_COLOR;
+  static const Color SETTINGS_SLIDER_INACTIVE_COLOR = _GREY_DARK3_COLOR;
+  static const Color SETTINGS_SLIDER_CIRCLE_COLOR = _BLACK_COLOR;
+  static const Color SETTINGS_SLIDER_CIRCLE_OVERLAY_COLOR = _GREY_LIGHT3_COLOR;
+
+  //subscription tile
+  static const Color SUBSCRIPTION_TILE_BACKGROUND_COLOR = _WHITE_COLOR;
+  static const Color SUBSCRIPTION_TILE_TITLE_TEXT_COLOR = _BLACK_COLOR;
+  static const Color SUBSCRIPTION_TILE_DESCRIPTION_TEXT_COLOR = _GREY3_COLOR;
+  static const Color SUBSCRIPTION_TILE_BUTTON_BACKGROUND_COLOR = _BLUE_NAVY_COLOR;
+  static const Color SUBSCRIPTION_TILE_BUTTON_TEXT_COLOR = _WHITE_COLOR;
+
+}

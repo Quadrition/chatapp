@@ -80,3 +80,8 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+  assets:
+    - res/img/appAsset_85.png
+    - res/img/appAsset_97.png
+    - res/img/login_screen_icon.png

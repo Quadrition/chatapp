@@ -5,7 +5,7 @@ class AppSettingsService {
   static AppSettingsService _instance;
   static SharedPreferences _preferences;
 
-  static const String _UsernameKey = 'username';
+  static const String _uIdUserKey = 'uIdUser';
   static const String _FcmTokenKey = 'fcm_token';
   static const String _DeviceIdKey = 'device_id';
 
@@ -22,12 +22,12 @@ class AppSettingsService {
   }
 
 
-  String get username => _getFromDisk(_UsernameKey) ?? "";
-  set username(String value) => _saveToDisk(_UsernameKey, value);
+  String get uIdUser => _getFromDisk(_uIdUserKey) ?? "";
+  set uIdUser(String value) => _saveToDisk(_uIdUserKey, value);
 
   //checks whether the user is already registered which is the same as if the username exists
   bool get isFirstRun {
-    if (username=="") {
+    if (uIdUser=="") {
       return true;
     } else {
       return false;
@@ -77,6 +77,4 @@ class AppSettingsService {
       _preferences.setStringList(key, content);
     }
   }
-
-
 }

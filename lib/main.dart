@@ -1,3 +1,4 @@
+import 'package:chatapp/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'services/app_settings.dart';
 import 'registration_screen.dart';
@@ -64,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
       debugPrint("first run");
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => RegistrationScreen()),
+        MaterialPageRoute(builder: (context) => LoginScreen()),
       );
 
     } else {
@@ -73,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void _incrementCounter() {
+  void _incrementCounter() async {
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -82,6 +83,9 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
+
+    var appSettings = await AppSettingsService.getInstance();
+    appSettings.uIdUser = '';
   }
 
   @override

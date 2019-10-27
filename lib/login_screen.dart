@@ -225,11 +225,10 @@ class LoginScreenState extends State<LoginScreen> {
     setState(() {
       this.workInProgress = false;
     });
-    Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage()));
+    Navigator.popUntil(context, ModalRoute.withName('/'));
   }
 
   _goToRegistration() async {
-
     Navigator.push(context, MaterialPageRoute(builder: (context) => RegistrationScreen()));
   }
 

@@ -1,15 +1,11 @@
-import 'package:chatapp/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'services/app_settings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 //import 'services/http_services.dart';
-import 'values/app_dimens.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'values/app_colors.dart';
 import 'components/form_field.dart';
 import 'components/form_button.dart';
-import 'main.dart';
 //import 'components/error_dialog.dart';
 //import 'services/firebase_notifications.dart';
 
@@ -241,9 +237,11 @@ class MyCustomFormState extends State<RegistrationScreen> {
     setState(() {
       this.workInProgress = false;
     });
-    Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage()));
+    //Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage()));
+    Navigator.popUntil(context, ModalRoute.withName('/'));
   }
   _goBack() async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+    //Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+    Navigator.pop(context);
   }
 }

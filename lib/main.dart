@@ -52,7 +52,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+
+  bool workInProgress = false;
 
   @override
   void initState() {
@@ -60,6 +61,10 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     checkFirstRun();
   }
+
+  List<Choice> choices = const <Choice>[
+    const Choice(title: 'Log out', icon: Icons.exit_to_app),
+  ];
 
   checkFirstRun() async {
     debugPrint("check first run started");
@@ -79,20 +84,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void _incrementCounter() async {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-
-    var appSettings = await AppSettingsService.getInstance();
-    appSettings.uIdUser = '';
-  }
-
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -102,50 +93,111 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
+      appBar: PreferredSize(
+        child: AppBar(
+          title: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Center(
+                child: Container(
+                  child: Image.asset("res/img/login_screen_icon.png", scale: 6, width: 50, height: 50),
+                ),
+              ),
+              Container(
+                child: Text('Chat App'),
+                margin: EdgeInsets.symmetric(horizontal: 10),
+              )
+            ],
+          ),
+          actions: <Widget>[
+            PopupMenuButton<Choice>(
+              onSelected: onItemMenuPress,
+              itemBuilder: (BuildContext context) {
+                return choices.map((Choice choice) {
+                  return PopupMenuItem<Choice>(
+                      value: choice,
+                      child: Row(
+                        children: <Widget>[
+                          Icon(
+                            choice.icon,
+                          ),
+                          Container(
+                            width: 10.0,
+                          ),
+                          Text(
+                            choice.title,
+                          ),
+                        ],
+                      ));
+                }).toList();
+              },
             ),
           ],
         ),
+        preferredSize: Size.fromHeight(75),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
+      body: Stack(
+        children: <Widget>[
+          Center(
+            child: Column(
+              // Column is also a layout widget. It takes a list of children and
+              // arranges them vertically. By default, it sizes itself to fit its
+              // children horizontally, and tries to be as tall as its parent.
+              //
+              // Invoke "debug painting" (press "p" in the console, choose the
+              // "Toggle Debug Paint" action from the Flutter Inspector in Android
+              // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
+              // to see the wireframe for each widget.
+              //
+              // Column has various properties to control how it sizes itself and
+              // how it positions its children. Here we use mainAxisAlignment to
+              // center the children vertically; the main axis here is the vertical
+              // axis because Columns are vertical (the cross axis would be
+              // horizontal).
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  'You have pushed the button this many times:',
+                ),
+              ],
+            ),
+          ),
+          workInProgress ? Container(
+            child: Center(
+                child: CircularProgressIndicator()
+            ),
+            color: Colors.transparent.withOpacity(0.8),
+          ) : Container(),
+        ],
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
-  //checks whether the user has already been registered or not and opens an appropriate screen
+  void onItemMenuPress(Choice choice) {
+    if (choice.title == 'Log out') {
+      handleSignOut();
+    }
+  }
 
+  Future<Null> handleSignOut() async {
+    this.setState(() {
+      workInProgress = true;
+    });
 
+    var appSettings = await AppSettingsService.getInstance();
+    appSettings.uIdUser = '';
+
+    this.setState(() {
+      workInProgress = false;
+    });
+
+    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => MyApp()), (Route<dynamic> route) => false);
+  }
+}
+
+class Choice {
+  const Choice({this.title, this.icon});
+
+  final String title;
+  final IconData icon;
 }

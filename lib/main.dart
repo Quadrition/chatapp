@@ -2,6 +2,7 @@ import 'package:chatapp/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'services/app_settings.dart';
 import 'registration_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() => runApp(MyApp());
 
@@ -34,12 +35,12 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key}) : super(key: key);
+  MyHomePage({Key key, @required this.currentUserUid}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
   // how it looks.
-
+  final String currentUserUid;
   // This class is the configuration for the state. It holds the values (in this
   // case the title) provided by the parent (in this case the App widget) and
   // used by the build method of the State. Fields in a Widget subclass are
@@ -48,18 +49,21 @@ class MyHomePage extends StatefulWidget {
   final String title = "Chat App";
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _MyHomePageState createState() => _MyHomePageState(currentUserUid: currentUserUid);
 }
 
 class _MyHomePageState extends State<MyHomePage> {
 
+  _MyHomePageState({Key key, @required this.currentUserUid});
+
   bool workInProgress = false;
+  final String currentUserUid;
 
   @override
   void initState() {
     debugPrint("main init state");
-    super.initState();
     checkFirstRun();
+    super.initState();
   }
 
   List<Choice> choices = const <Choice>[
@@ -138,28 +142,23 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Stack(
         children: <Widget>[
-          Center(
-            child: Column(
-              // Column is also a layout widget. It takes a list of children and
-              // arranges them vertically. By default, it sizes itself to fit its
-              // children horizontally, and tries to be as tall as its parent.
-              //
-              // Invoke "debug painting" (press "p" in the console, choose the
-              // "Toggle Debug Paint" action from the Flutter Inspector in Android
-              // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-              // to see the wireframe for each widget.
-              //
-              // Column has various properties to control how it sizes itself and
-              // how it positions its children. Here we use mainAxisAlignment to
-              // center the children vertically; the main axis here is the vertical
-              // axis because Columns are vertical (the cross axis would be
-              // horizontal).
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  'You have pushed the button this many times:',
-                ),
-              ],
+          Container(
+            child: StreamBuilder(
+              stream: Firestore.instance.collection('users').snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                    ),
+                  );
+                } else {
+                  return ListView.builder(
+                    padding: EdgeInsets.all(10.0),
+                    itemBuilder: (context, index) => buildItem(context, snapshot.data.documents[index]),
+                    itemCount: snapshot.data.documents.length,
+                  );
+                }
+              },
             ),
           ),
           workInProgress ? Container(
@@ -171,6 +170,53 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  Widget buildItem(BuildContext context, DocumentSnapshot document) {
+    if (document['uid'] == currentUserUid) {
+      return Container();
+    } else {
+      return Container(
+        child: FlatButton(
+          child: Row(
+            children: <Widget>[
+              Material(
+                child: Icon(
+                  Icons.account_circle,
+                  size: 50.0,
+                ),
+                borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                clipBehavior: Clip.hardEdge,
+              ),
+              Flexible(
+                child: Container(
+                  child: Container(
+                    child: Text(
+                      'Nickname: ${document['displayName']}',
+                    ),
+                    alignment: Alignment.centerLeft,
+                    margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
+                  ),
+                  margin: EdgeInsets.only(left: 20.0),
+                ),
+              ),
+            ],
+          ),
+//          onPressed: () {
+//            Navigator.push(
+//                context,
+//                MaterialPageRoute(
+//                    builder: (context) => Chat(
+//                      peerId: document.documentID,
+//                      peerAvatar: document['photoUrl'],
+//                    )));
+//          },
+          padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+        ),
+        margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
+      );
+    }
   }
 
   void onItemMenuPress(Choice choice) {

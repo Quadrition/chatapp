@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'services/app_settings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -28,6 +29,7 @@ class MyCustomFormState extends State<RegistrationScreen> {
   final myPasswordController = TextEditingController();
   final myConfirmPasswordController = TextEditingController();
   final myEmailController = TextEditingController();
+  final myDisplayNameController = TextEditingController();
   bool workInProgress = false;
 
   String errorMessage = null;
@@ -87,7 +89,17 @@ class MyCustomFormState extends State<RegistrationScreen> {
                                   validatorFunction: _validateEmail,
                                   textFieldController: myEmailController,
                                   textInputType: TextInputType.emailAddress,
-                                  iconName: "appAsset_85.png",
+                                  iconName: 'appAsset_85.png'
+                                ),
+                                FormFieldWidget(
+                                  hintText: "display_name",
+                                  validatorFunction: (value) {
+                                    if (value.isEmpty) {
+                                      return "missing_display_name";
+                                    }
+                                  },
+                                  textFieldController: myDisplayNameController,
+                                  iconName: "account_circle.png",
                                 ),
                                 FormFieldWidget(
                                   hintText: "password",
@@ -190,7 +202,6 @@ class MyCustomFormState extends State<RegistrationScreen> {
 
   _registerNewUser() async {
 
-    var instance = await AppSettingsService.getInstance();
     setState(() {
       this.workInProgress = true;
     });
@@ -233,6 +244,15 @@ class MyCustomFormState extends State<RegistrationScreen> {
     // Adds uid to config
     var appSettings = await AppSettingsService.getInstance();
     appSettings.uIdUser = user.uid;
+    appSettings.displayNameUser = myDisplayNameController.text;
+
+    Firestore.instance.collection('users').document(user.uid).setData({
+      'email': user.email,
+      'displayName': myDisplayNameController.text,
+      'uid': user.uid,
+      'createdAt': DateTime.now().toString(),
+      'chattingWith': null
+    });
 
     setState(() {
       this.workInProgress = false;

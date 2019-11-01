@@ -99,7 +99,7 @@ class MyCustomFormState extends State<RegistrationScreen> {
                                     }
                                   },
                                   textFieldController: myDisplayNameController,
-                                  iconName: "account_circle.png",
+                                  iconName: "appAsset_96.png",
                                 ),
                                 FormFieldWidget(
                                   hintText: "password",
@@ -245,6 +245,7 @@ class MyCustomFormState extends State<RegistrationScreen> {
     var appSettings = await AppSettingsService.getInstance();
     appSettings.uIdUser = user.uid;
     appSettings.displayNameUser = myDisplayNameController.text;
+    appSettings.username=myEmailController.text;
 
     Firestore.instance.collection('users').document(user.uid).setData({
       'email': user.email,

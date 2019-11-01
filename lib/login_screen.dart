@@ -176,7 +176,7 @@ class LoginScreenState extends State<LoginScreen> {
 
   _login() async {
 
-    var instance = await AppSettingsService.getInstance();
+    //var instance = await AppSettingsService.getInstance();
     setState(() {
       this.workInProgress = true;
     });
@@ -221,6 +221,7 @@ class LoginScreenState extends State<LoginScreen> {
     // Adds uid to config
     var appSettings = await AppSettingsService.getInstance();
     appSettings.uIdUser = user.uid;
+    appSettings.username = myEmailController.text;
 
     setState(() {
       this.workInProgress = false;

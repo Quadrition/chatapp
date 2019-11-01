@@ -9,6 +9,7 @@ class AppSettingsService {
   static const String _displayNameUser = 'displayNameUser';
   static const String _FcmTokenKey = 'fcm_token';
   static const String _DeviceIdKey = 'device_id';
+  static const String _Username = 'username';
 
   static Future<AppSettingsService> getInstance() async {
     if (_instance == null) {
@@ -28,6 +29,9 @@ class AppSettingsService {
 
   String get displayNameUser => _getFromDisk(_displayNameUser) ?? "";
   set displayNameUser(String value) => _saveToDisk(_displayNameUser, value);
+
+  String get username => _getFromDisk(_Username) ?? "";
+  set username(String value) => _saveToDisk(_Username, value);
 
   //checks whether the user is already registered which is the same as if the username exists
   bool get isFirstRun {

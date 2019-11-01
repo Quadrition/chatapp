@@ -57,18 +57,29 @@ class _MyHomePageState extends State<MyHomePage> {
   _MyHomePageState({Key key, @required this.currentUserUid});
 
   bool workInProgress = false;
-  final String currentUserUid;
+  String currentUserUid;
 
   @override
   void initState() {
     debugPrint("main init state");
     checkFirstRun();
     super.initState();
+    /*loadUserId().then((result) {
+      setState(() {
+        currentUserUid = result;
+      });
+      debugPrint("current User Id is " + currentUserUid);
+    });*/
   }
 
   List<Choice> choices = const <Choice>[
     const Choice(title: 'Log out', icon: Icons.exit_to_app),
   ];
+
+  Future<String> loadUserId() async {
+    AppSettingsService appSettingsService = await AppSettingsService.getInstance();
+    return appSettingsService.uIdUser;
+  }
 
   checkFirstRun() async {
     debugPrint("check first run started");

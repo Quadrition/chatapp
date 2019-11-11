@@ -232,7 +232,6 @@ class LoginScreenState extends State<LoginScreen> {
   _goToRegistration() async {
     Navigator.push(context, MaterialPageRoute(builder: (context) => RegistrationScreen()));
   }
-
 }
 
 

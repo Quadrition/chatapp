@@ -1,3 +1,4 @@
+import 'package:chatapp/chat.dart';
 import 'package:chatapp/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'services/app_settings.dart';
@@ -35,12 +36,12 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, @required this.currentUserUid}) : super(key: key);
+  MyHomePage({Key key}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
   // how it looks.
-  final String currentUserUid;
+
   // This class is the configuration for the state. It holds the values (in this
   // case the title) provided by the parent (in this case the App widget) and
   // used by the build method of the State. Fields in a Widget subclass are
@@ -49,12 +50,12 @@ class MyHomePage extends StatefulWidget {
   final String title = "Chat App";
 
   @override
-  _MyHomePageState createState() => _MyHomePageState(currentUserUid: currentUserUid);
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  _MyHomePageState({Key key, @required this.currentUserUid});
+  _MyHomePageState({Key key});
 
   bool workInProgress = false;
   String currentUserUid;
@@ -76,11 +77,6 @@ class _MyHomePageState extends State<MyHomePage> {
     const Choice(title: 'Log out', icon: Icons.exit_to_app),
   ];
 
-  Future<String> loadUserId() async {
-    AppSettingsService appSettingsService = await AppSettingsService.getInstance();
-    return appSettingsService.uIdUser;
-  }
-
   checkFirstRun() async {
     debugPrint("check first run started");
     var instance = await AppSettingsService.getInstance();
@@ -95,6 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     } else {
       debugPrint("not first run");
+      currentUserUid = await instance.uIdUser;
       //TODO navigate to main screen
     }
   }
@@ -203,7 +200,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Container(
                   child: Container(
                     child: Text(
-                      'Nickname: ${document['displayName']}',
+                      document['displayName'],
                     ),
                     alignment: Alignment.centerLeft,
                     margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
@@ -213,15 +210,16 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ],
           ),
-//          onPressed: () {
-//            Navigator.push(
-//                context,
-//                MaterialPageRoute(
-//                    builder: (context) => Chat(
-//                      peerId: document.documentID,
-//                      peerAvatar: document['photoUrl'],
-//                    )));
-//          },
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ChatPage(
+                      currentUserId: currentUserUid,
+                      peerId: document.documentID,
+                      peerDisplayName: document['displayName'],
+                    )));
+          },
           padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
         ),

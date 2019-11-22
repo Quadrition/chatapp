@@ -1,9 +1,12 @@
 import 'package:chatapp/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'services/app_settings.dart';
+import 'dart:io';
 import 'registration_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
 import 'values/app_colors.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class ChatPage extends StatefulWidget {
@@ -38,6 +41,8 @@ class ChatPageState extends State<ChatPage> {
   TextEditingController textEditingController = new TextEditingController();
   ScrollController scrollController;
   var listMessages;
+  File imageFile;
+  String imageUrl;
 
   String groupChatId;
 
@@ -117,7 +122,7 @@ class ChatPageState extends State<ChatPage> {
               margin: new EdgeInsets.symmetric(horizontal: 1.0),
               child: new IconButton(
                 icon: new Icon(Icons.image),
-                //onPressed: getImage,
+                onPressed: displayImageGallery,
               ),
             ),
             color: Colors.white,
@@ -154,6 +159,35 @@ class ChatPageState extends State<ChatPage> {
       decoration: new BoxDecoration(
           border: new Border(top: new BorderSide(width: 0.5)), color: Colors.white),
     );
+  }
+
+  Future displayImageGallery() async {
+    imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
+
+    if (imageFile != null) {
+      setState(() {
+        workInProgress = true;
+      });
+      uploadFile();
+    }
+  }
+
+  Future uploadFile() async {
+    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    StorageReference reference = FirebaseStorage.instance.ref().child(fileName);
+    StorageUploadTask uploadTask = reference.putFile(imageFile);
+    StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
+    storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
+      imageUrl = downloadUrl;
+      setState(() {
+        workInProgress = false;
+        onSendMessage(imageUrl, 1);
+      });
+    }, onError: (err) {
+      setState(() {
+        workInProgress = false;
+      });
+    });
   }
 
   Widget buildListMessage() {

@@ -252,7 +252,7 @@ class MyCustomFormState extends State<RegistrationScreen> {
       'displayName': myDisplayNameController.text,
       'uid': user.uid,
       'createdAt': DateTime.now().toString(),
-      'chattingWith': null
+      'chatHistory': null
     });
 
     setState(() {

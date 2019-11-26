@@ -23,7 +23,6 @@ class AppSettingsService {
     return _instance;
   }
 
-
   String get uIdUser => _getFromDisk(_uIdUserKey) ?? "";
   set uIdUser(String value) => _saveToDisk(_uIdUserKey, value);
 

@@ -10,7 +10,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class ChatPage extends StatefulWidget {
-  ChatPage({Key key, @required this.peerId, @required this.currentUserId, @required this.peerDisplayName}) : super(key: key);
+  ChatPage({Key key, @required this.currentUserId, @required this.groupChatId}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -20,31 +20,29 @@ class ChatPage extends StatefulWidget {
   // case the title) provided by the parent (in this case the App widget) and
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
-  final String peerId;
+  final String groupChatId;
   final String currentUserId;
-  final String peerDisplayName;
 
   @override
-  ChatPageState createState() => ChatPageState(peerId: this.peerId, currentUserUid: this.currentUserId, peerDisplayName: this.peerDisplayName);
+  ChatPageState createState() => ChatPageState(currentUserUid: this.currentUserId, groupChatId: this.groupChatId);
 }
 
 class ChatPageState extends State<ChatPage> {
 
   ChatPageState(
-      {Key key, @required this.peerId, @required this.currentUserUid, @required this.peerDisplayName});
+      {Key key, @required this.currentUserUid, @required this.groupChatId});
 
   bool workInProgress = false;
   final String currentUserUid;
-  final String peerId;
-  final String peerDisplayName;
+  final String groupChatId;
 
   TextEditingController textEditingController = new TextEditingController();
   ScrollController scrollController;
   var listMessages;
   File imageFile;
   String imageUrl;
-
-  String groupChatId;
+  DocumentSnapshot groupSnapShot;
+  String groupName;
 
   @override
   void initState() {
@@ -59,13 +57,25 @@ class ChatPageState extends State<ChatPage> {
     readInitValues();
   }
 
-  readInitValues() async {
-    if (currentUserUid.hashCode <= peerId.hashCode) {
-      groupChatId = '$currentUserUid-$peerId';
-    }
-    else {
-      groupChatId = '$peerId-$currentUserUid';
-    }
+  void readInitValues() async {
+     await Firestore.instance.collection('messages').document(groupChatId).get().then((documentSnapShot) {
+
+      groupSnapShot = documentSnapShot;
+    });
+
+     if (groupSnapShot.data['isGroup']) {
+       this.groupName = groupSnapShot.data['groupName'];
+     }
+     else {
+       String peerId = groupSnapShot.data['first'];
+       if (peerId == currentUserUid) {
+         peerId = groupSnapShot.data['second'];
+       }
+
+       await Firestore.instance.collection('users').document(peerId).get().then((document) {
+         this.groupName = document.data['displayName'];
+       });
+     }
   }
 
   @override
@@ -83,7 +93,7 @@ class ChatPageState extends State<ChatPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Container(
-                child: Text(peerDisplayName),
+                child: Text(groupName),
                 margin: EdgeInsets.symmetric(horizontal: 10),
               )
             ],
@@ -183,11 +193,14 @@ class ChatPageState extends State<ChatPage> {
         workInProgress = false;
         onSendMessage(imageUrl, 1);
       });
+
     }, onError: (err) {
       setState(() {
         workInProgress = false;
       });
+
     });
+
   }
 
   Widget buildListMessage() {
@@ -198,7 +211,7 @@ class ChatPageState extends State<ChatPage> {
         stream: Firestore.instance
             .collection('messages')
             .document(groupChatId)
-            .collection(groupChatId)
+            .collection('messages')
             .orderBy('timestamp', descending: true)
             .limit(20)
             .snapshots(),
@@ -237,9 +250,7 @@ class ChatPageState extends State<ChatPage> {
             decoration: BoxDecoration(borderRadius: BorderRadius.circular(8.0)),
             margin: EdgeInsets.only(bottom: 10.0, right: 10.0),
           )
-              : document['type'] == 1
-          // Image
-              ? Container(
+              : Container(
             child: Container(
               child: Material(
                 child: CachedNetworkImage(
@@ -278,16 +289,6 @@ class ChatPageState extends State<ChatPage> {
             ),
             margin: EdgeInsets.only(bottom:  10.0, right: 10.0),
           )
-          // Sticker
-              : Container(
-            child: new Image.asset(
-              'images/${document['content']}.gif',
-              width: 100.0,
-              height: 100.0,
-              fit: BoxFit.cover,
-            ),
-            margin: EdgeInsets.only(bottom: 10.0, right: 10.0),
-          ),
         ],
         mainAxisAlignment: MainAxisAlignment.end,
       );
@@ -377,7 +378,7 @@ class ChatPageState extends State<ChatPage> {
       var documentReference = Firestore.instance
           .collection('messages')
           .document(groupChatId)
-          .collection(groupChatId)
+          .collection('messages')
           .document(DateTime.now().millisecondsSinceEpoch.toString());
 
       Firestore.instance.runTransaction((transaction) async {
@@ -385,13 +386,13 @@ class ChatPageState extends State<ChatPage> {
           documentReference,
           {
             'idFrom': currentUserUid,
-            'idTo': peerId,
             'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
             'content': content,
             'type': type
           },
         );
       });
+
       scrollController.animateTo(0.0, duration: Duration(milliseconds: 300), curve: Curves.easeOut);
     }
   }

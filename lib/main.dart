@@ -1,5 +1,6 @@
 import 'package:chatapp/chat.dart';
 import 'package:chatapp/login_screen.dart';
+import 'package:chatapp/new_chat.dart';
 import 'package:flutter/material.dart';
 import 'services/app_settings.dart';
 import 'registration_screen.dart';
@@ -152,7 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
         children: <Widget>[
           Container(
             child: StreamBuilder(
-              stream: Firestore.instance.collection('users').snapshots(),
+              stream: Firestore.instance.collection('users').document(currentUserUid).collection('chatHistory').snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return Center(
@@ -176,57 +177,87 @@ class _MyHomePageState extends State<MyHomePage> {
             color: Colors.transparent.withOpacity(0.8),
           ) : Container(),
         ],
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _goToNewChat,
+        tooltip: 'New chat',
+        child: Icon(Icons.add),
+      ),
     );
+  }
+
+  _goToNewChat() async {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => NewChatScreen(currentUserId : this.currentUserUid)));
   }
 
   Widget buildItem(BuildContext context, DocumentSnapshot document) {
     if (document['uid'] == currentUserUid) {
       return Container();
     } else {
-      return Container(
-        child: FlatButton(
-          child: Row(
-            children: <Widget>[
-              Material(
-                child: Icon(
-                  Icons.account_circle,
-                  size: 50.0,
-                ),
-                borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                clipBehavior: Clip.hardEdge,
-              ),
-              Flexible(
-                child: Container(
-                  child: Container(
-                    child: Text(
-                      document['displayName'],
+        child: Container(
+            child : FlatButton(
+              child: Row(
+                children: <Widget>[
+                  Material(
+                    child: Icon(
+                      Icons.account_circle,
+                      size: 50.0,
                     ),
-                    alignment: Alignment.centerLeft,
-                    margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
+                    borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                    clipBehavior: Clip.hardEdge,
                   ),
-                  margin: EdgeInsets.only(left: 20.0),
-                ),
+                  Flexible(
+                    child: Container(
+                      child: Container(
+                        child: Text(
+                          getGroupName(document)
+                        ),
+                        alignment: Alignment.centerLeft,
+                        margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
+                      ),
+                      margin: EdgeInsets.only(left: 20.0),
+                    ),
+                  ),
+                ],
               ),
-            ],
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ChatPage(
+                          currentUserId: currentUserUid,
+                          groupChatId: document.data['uids']
+                        )));
+              },
+                padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
           ),
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ChatPage(
-                      currentUserId: currentUserUid,
-                      peerId: document.documentID,
-                      peerDisplayName: document['displayName'],
-                    )));
-          },
-          padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-        ),
-        margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
+          margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
       );
     }
   }
+
+  String getGroupName(DocumentSnapshot document) {
+    Firestore.instance.collection('messages').document(document.data['groupId']).get().then((groupDoc) {
+      document = groupDoc;
+    });
+    if (document.data['isGroup']) {
+      return document.data['groupName'];
+    }
+    else {
+      String peerId = document.data['first'];
+      if (peerId == currentUserUid) {
+        peerId = document.data['second'];
+      }
+
+      Firestore.instance.collection('users').document(peerId).get().then((document) {
+        return document.data['displayName'];
+      });
+    }
+
+    throw Exception();
+  }
+
 
   void onItemMenuPress(Choice choice) {
     if (choice.title == 'Log out') {

@@ -220,13 +220,14 @@ class LoginScreenState extends State<LoginScreen> {
 
     // Adds uid to config
     var appSettings = await AppSettingsService.getInstance();
-    appSettings.uIdUser = user.uid;
-    appSettings.username = myEmailController.text;
+    appSettings.idUser = user.uid;
+    appSettings.displayNameUser = user.displayName;
 
     setState(() {
       this.workInProgress = false;
     });
-    Navigator.popUntil(context, ModalRoute.withName('/'));
+
+    Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage()));
   }
 
   _goToRegistration() async {

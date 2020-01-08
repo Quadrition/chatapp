@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'main.dart';
 import 'services/app_settings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 //import 'services/http_services.dart';
@@ -243,23 +244,21 @@ class MyCustomFormState extends State<RegistrationScreen> {
 
     // Adds uid to config
     var appSettings = await AppSettingsService.getInstance();
-    appSettings.uIdUser = user.uid;
+    appSettings.idUser = user.uid;
     appSettings.displayNameUser = myDisplayNameController.text;
-    appSettings.username=myEmailController.text;
 
     Firestore.instance.collection('users').document(user.uid).setData({
       'email': user.email,
       'displayName': myDisplayNameController.text,
-      'uid': user.uid,
+      'id': user.uid,
       'createdAt': DateTime.now().toString(),
-      'chatHistory': null
     });
 
     setState(() {
       this.workInProgress = false;
     });
     //Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage()));
-    Navigator.popUntil(context, ModalRoute.withName('/'));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage()));
   }
   _goBack() async {
     //Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));

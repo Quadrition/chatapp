@@ -10,7 +10,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class ChatPage extends StatefulWidget {
-  ChatPage({Key key, @required this.currentUserId, @required this.groupChatId}) : super(key: key);
+  ChatPage({Key key, @required this.chatDocument, @required this.currentUserDoc, @required this.chatName}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -20,21 +20,22 @@ class ChatPage extends StatefulWidget {
   // case the title) provided by the parent (in this case the App widget) and
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
-  final String groupChatId;
-  final String currentUserId;
+  final DocumentSnapshot chatDocument;
+  final DocumentSnapshot currentUserDoc;
+  final String chatName;
 
   @override
-  ChatPageState createState() => ChatPageState(currentUserUid: this.currentUserId, groupChatId: this.groupChatId);
+  ChatPageState createState() => ChatPageState(chatDocument: this.chatDocument, currentUserDoc: this.currentUserDoc, chatName: this.chatName);
 }
 
 class ChatPageState extends State<ChatPage> {
 
-  ChatPageState(
-      {Key key, @required this.currentUserUid, @required this.groupChatId});
+  ChatPageState({Key key, @required this.chatDocument, @required this.currentUserDoc, @required this.chatName});
 
   bool workInProgress = false;
-  final String currentUserUid;
-  final String groupChatId;
+  final DocumentSnapshot chatDocument;
+  final DocumentSnapshot currentUserDoc;
+  final String chatName;
 
   TextEditingController textEditingController = new TextEditingController();
   ScrollController scrollController;
@@ -42,7 +43,6 @@ class ChatPageState extends State<ChatPage> {
   File imageFile;
   String imageUrl;
   DocumentSnapshot groupSnapShot;
-  String groupName;
 
   @override
   void initState() {
@@ -53,29 +53,6 @@ class ChatPageState extends State<ChatPage> {
       });
       debugPrint("current User Id is " + currentUserUid);
     });*/
-
-    readInitValues();
-  }
-
-  void readInitValues() async {
-     await Firestore.instance.collection('messages').document(groupChatId).get().then((documentSnapShot) {
-
-      groupSnapShot = documentSnapShot;
-    });
-
-     if (groupSnapShot.data['isGroup']) {
-       this.groupName = groupSnapShot.data['groupName'];
-     }
-     else {
-       String peerId = groupSnapShot.data['first'];
-       if (peerId == currentUserUid) {
-         peerId = groupSnapShot.data['second'];
-       }
-
-       await Firestore.instance.collection('users').document(peerId).get().then((document) {
-         this.groupName = document.data['displayName'];
-       });
-     }
   }
 
   @override
@@ -93,7 +70,7 @@ class ChatPageState extends State<ChatPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Container(
-                child: Text(groupName),
+                child: Text(chatName),
                 margin: EdgeInsets.symmetric(horizontal: 10),
               )
             ],
@@ -205,12 +182,12 @@ class ChatPageState extends State<ChatPage> {
 
   Widget buildListMessage() {
     return Flexible(
-      child: groupChatId == ''
+      child: chatDocument == null
           ? Center(child: CircularProgressIndicator())
           : StreamBuilder(
         stream: Firestore.instance
-            .collection('messages')
-            .document(groupChatId)
+            .collection('chats')
+            .document(chatDocument.documentID)
             .collection('messages')
             .orderBy('timestamp', descending: true)
             .limit(20)
@@ -235,7 +212,7 @@ class ChatPageState extends State<ChatPage> {
   }
 
   Widget buildItem(int index, DocumentSnapshot document) {
-    if (document['idFrom'] == currentUserUid) {
+    if (document['idFrom'] == currentUserDoc.documentID) {
       // Right (my message)
       return Row(
         children: <Widget>[
@@ -376,8 +353,8 @@ class ChatPageState extends State<ChatPage> {
       textEditingController.clear();
 
       var documentReference = Firestore.instance
-          .collection('messages')
-          .document(groupChatId)
+          .collection('chats')
+          .document(chatDocument.documentID)
           .collection('messages')
           .document(DateTime.now().millisecondsSinceEpoch.toString());
 
@@ -385,7 +362,7 @@ class ChatPageState extends State<ChatPage> {
         await transaction.set(
           documentReference,
           {
-            'idFrom': currentUserUid,
+            'idFrom': currentUserDoc.documentID,
             'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
             'content': content,
             'type': type

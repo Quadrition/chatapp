@@ -59,19 +59,16 @@ class _MyHomePageState extends State<MyHomePage> {
   _MyHomePageState({Key key});
 
   bool workInProgress = false;
-  String currentUserUid;
+
+  DocumentSnapshot currentUserDocument;
+
+  List<DocumentSnapshot> snaps;
 
   @override
   void initState() {
     debugPrint("main init state");
     checkFirstRun();
     super.initState();
-    /*loadUserId().then((result) {
-      setState(() {
-        currentUserUid = result;
-      });
-      debugPrint("current User Id is " + currentUserUid);
-    });*/
   }
 
   List<Choice> choices = const <Choice>[
@@ -92,8 +89,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
     } else {
       debugPrint("not first run");
-      currentUserUid = await instance.uIdUser;
-      //TODO navigate to main screen
+      Firestore.instance.collection('users').document(instance.idUser).get().then((doc) {
+        this.setState(() {
+          currentUserDocument = doc;
+        });
+      });
     }
   }
 
@@ -153,7 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
         children: <Widget>[
           Container(
             child: StreamBuilder(
-              stream: Firestore.instance.collection('users').document(currentUserUid).collection('chatHistory').snapshots(),
+              stream: Firestore.instance.collection('users').document(currentUserDocument == null ? 'unknown' : currentUserDocument.documentID).collection('chatHistory').snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return Center(
@@ -187,77 +187,53 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _goToNewChat() async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => NewChatScreen(currentUserId : this.currentUserUid)));
+    //Navigator.push(context, MaterialPageRoute(builder: (context) => NewChatScreen(currentUserId : this.currentUserId)));
   }
 
   Widget buildItem(BuildContext context, DocumentSnapshot document) {
-    if (document['uid'] == currentUserUid) {
-      return Container();
-    } else {
-        child: Container(
-            child : FlatButton(
-              child: Row(
-                children: <Widget>[
-                  Material(
-                    child: Icon(
-                      Icons.account_circle,
-                      size: 50.0,
-                    ),
-                    borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                    clipBehavior: Clip.hardEdge,
+      return Container(
+          child : FlatButton(
+            child: Row(
+              children: <Widget>[
+                Material(
+                  child: Icon(
+                    Icons.account_circle,
+                    size: 50.0,
                   ),
-                  Flexible(
+                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                  clipBehavior: Clip.hardEdge,
+                ),
+                Flexible(
+                  child: Container(
                     child: Container(
-                      child: Container(
-                        child: Text(
-                          getGroupName(document)
-                        ),
-                        alignment: Alignment.centerLeft,
-                        margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
+                      child: Text(
+                          document.data['chatName']
                       ),
-                      margin: EdgeInsets.only(left: 20.0),
+                      alignment: Alignment.centerLeft,
+                      margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
                     ),
+                    margin: EdgeInsets.only(left: 20.0),
                   ),
-                ],
-              ),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ChatPage(
-                          currentUserId: currentUserUid,
-                          groupChatId: document.data['uids']
-                        )));
-              },
-                padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-          ),
-          margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
-      );
-    }
+                ),
+              ],
+            ),
+            onPressed: () async {
+              DocumentSnapshot chatDoc = await document.data['chatDoc'].get();
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ChatPage(
+                        chatDocument: chatDoc,
+                        currentUserDoc: currentUserDocument,
+                        chatName: document.data['chatName'],
+                      )));
+            },
+              padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+        ),
+        margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
+    );
   }
-
-  String getGroupName(DocumentSnapshot document) {
-    Firestore.instance.collection('messages').document(document.data['groupId']).get().then((groupDoc) {
-      document = groupDoc;
-    });
-    if (document.data['isGroup']) {
-      return document.data['groupName'];
-    }
-    else {
-      String peerId = document.data['first'];
-      if (peerId == currentUserUid) {
-        peerId = document.data['second'];
-      }
-
-      Firestore.instance.collection('users').document(peerId).get().then((document) {
-        return document.data['displayName'];
-      });
-    }
-
-    throw Exception();
-  }
-
 
   void onItemMenuPress(Choice choice) {
     if (choice.title == 'Log out') {
@@ -271,7 +247,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
     var appSettings = await AppSettingsService.getInstance();
-    appSettings.uIdUser = '';
+    appSettings.idUser = '';
 
     this.setState(() {
       workInProgress = false;

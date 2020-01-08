@@ -5,11 +5,10 @@ class AppSettingsService {
   static AppSettingsService _instance;
   static SharedPreferences _preferences;
 
-  static const String _uIdUserKey = 'uIdUser';
-  static const String _displayNameUser = 'displayNameUser';
+  static const String _IdUserKey = 'idUser';
+  static const String _DisplayNameUserKey = 'displayNameUser';
   static const String _FcmTokenKey = 'fcm_token';
   static const String _DeviceIdKey = 'device_id';
-  static const String _Username = 'username';
 
   static Future<AppSettingsService> getInstance() async {
     if (_instance == null) {
@@ -23,18 +22,15 @@ class AppSettingsService {
     return _instance;
   }
 
-  String get uIdUser => _getFromDisk(_uIdUserKey) ?? "";
-  set uIdUser(String value) => _saveToDisk(_uIdUserKey, value);
+  String get idUser => _getFromDisk(_IdUserKey) ?? "";
+  set idUser(String value) => _saveToDisk(_IdUserKey, value);
 
-  String get displayNameUser => _getFromDisk(_displayNameUser) ?? "";
-  set displayNameUser(String value) => _saveToDisk(_displayNameUser, value);
-
-  String get username => _getFromDisk(_Username) ?? "";
-  set username(String value) => _saveToDisk(_Username, value);
+  String get displayNameUser => _getFromDisk(_DisplayNameUserKey) ?? "";
+  set displayNameUser(String value) => _saveToDisk(_DisplayNameUserKey, value);
 
   //checks whether the user is already registered which is the same as if the username exists
   bool get isFirstRun {
-    if (uIdUser=="") {
+    if (idUser=="") {
       return true;
     } else {
       return false;

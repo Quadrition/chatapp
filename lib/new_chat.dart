@@ -6,7 +6,7 @@ import 'registration_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NewChatScreen extends StatefulWidget {
-  NewChatScreen({Key key, @required this.currentUserId}) : super(key: key);
+  NewChatScreen({Key key, @required this.currentUserDoc}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -17,19 +17,19 @@ class NewChatScreen extends StatefulWidget {
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
 
-  final String currentUserId;
+  final DocumentSnapshot currentUserDoc;
 
   @override
-  NewChatScreenState createState() => NewChatScreenState(currentUserId: currentUserId);
+  NewChatScreenState createState() => NewChatScreenState(currentUserDoc: currentUserDoc);
 }
 
 class NewChatScreenState extends State<NewChatScreen> {
 
-  NewChatScreenState({Key key, @required this.currentUserId});
+  NewChatScreenState({Key key, @required this.currentUserDoc});
 
   bool workInProgress = false;
-  final String currentUserId;
 
+  final DocumentSnapshot currentUserDoc;
   List<ListItem<DocumentSnapshot>> list;
 
   @override
@@ -49,18 +49,19 @@ class NewChatScreenState extends State<NewChatScreen> {
 
   void populateList() async {
     list = new List<ListItem<DocumentSnapshot>>();
-    Firestore.instance
-        .collection('users')
-        .snapshots()
-        .listen((snapshot) {
-      snapshot.documents.forEach((document) {
+    Firestore.instance.collection('users').getDocuments().then((stream) {
+      stream.documents.forEach((document) {
         setState(() {
-          list.add(new ListItem(document));
+          if (document.documentID != currentUserDoc.documentID) {
+            list.add(new ListItem(document));
+          }
         });
-
+        });
       });
-    });
 
+//    list = [];
+//    for (int i = 0; i < 10; i++)
+//      list.add(ListItem<String>("item $i"));
   }
 
   @override
@@ -85,7 +86,7 @@ class NewChatScreenState extends State<NewChatScreen> {
                     padding: EdgeInsets.all(10.0),
                     itemBuilder: buildItem,
                     itemCount: list.length
-                  )
+                  ),
           ),
           workInProgress ? Container(
             child: Center(
@@ -103,21 +104,15 @@ class NewChatScreenState extends State<NewChatScreen> {
   }
 
   Widget buildItem(BuildContext context, int index) {
-    if (list[index].data.data['uid'] == currentUserId) {
-      return Container();
-    } else {
-      child: Container(
+//    if (list[index].data.data['uid'] == currentUserId) {
+//      return Container();
+//    } else {
+      return Container(
+        color: list[index].isSelected ? Colors.red[100] : Colors.white,
         child : GestureDetector(
           onTap: () {
-            if (list.any((item) => item.isSelected)) {
-              setState(() {
-                list[index].isSelected = !list[index].isSelected;
-              });
-            }
-          },
-          onLongPress: () {
             setState(() {
-              list[index].isSelected = true;
+              list[index].isSelected = !list[index].isSelected;
             });
           },
           child: Row(
@@ -147,13 +142,51 @@ class NewChatScreenState extends State<NewChatScreen> {
         ),
         margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
       );
+//    }
+  }
+
+  void _createNewChat() async {
+    List<DocumentSnapshot> selectedUsers = new List<DocumentSnapshot>();
+    list.where((item) => item.isSelected).forEach((item) {
+
+      selectedUsers.add(item.data);
+    });
+
+    if (selectedUsers.length == 1) {
+      DocumentSnapshot peerDoc = selectedUsers[0];
+      currentUserDoc.reference.collection('chatHistory').getDocuments().then((documents) {
+        documents.documents.forEach((document) async {
+          if (document.data['chatDoc'].collection('users').document(peerDoc.documentID) != null)
+          {
+            DocumentSnapshot ds = await document.data['chatDoc'].get();
+
+            Navigator.pop(context);
+            Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage(chatDocument: ds, chatName: document.data['chatName'], currentUserDoc: currentUserDoc)));
+            return;
+          }
+        });
+      });
+
+      DocumentReference ref = await Firestore.instance.collection('chats').add({
+        'isGroup': false
+      });
+      ref.collection('users').document(currentUserDoc.documentID).setData({
+        'userId': currentUserDoc.documentID,
+        'userDoc': currentUserDoc.reference
+      });
+      ref.collection('users').document(peerDoc.documentID).setData({
+        'userId': peerDoc.documentID,
+        'userDoc': peerDoc.reference
+      });
+
+
+      Navigator.pop(context);
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage(chatDocument: ds, chatName: document.data['chatName'], currentUserDoc: currentUserDoc)));
+    }
+    else {
+
     }
   }
-
-  void _createNewChat() {
-
-  }
-
 }
 
 class ListItem<T> {

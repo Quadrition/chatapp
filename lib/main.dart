@@ -82,10 +82,8 @@ class _MyHomePageState extends State<MyHomePage> {
     debugPrint("first run value is: " + _firstRun.toString());
     if (_firstRun) {
       debugPrint("first run");
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
-      );
+      //Navigator.pushAndRemoveUntil(context, ModalRoute.withName('/loginscreen'));
+      Navigator.of(context).pushReplacementNamed('/loginscreen');
 
     } else {
       debugPrint("not first run");
@@ -117,7 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               Container(
-                child: Text('Chat App'),
+                child: Text(currentUserDocument == null ? 'loading' : currentUserDocument.data['displayName']),
                 margin: EdgeInsets.symmetric(horizontal: 10),
               )
             ],
@@ -186,8 +184,8 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  _goToNewChat() async {
-    //Navigator.push(context, MaterialPageRoute(builder: (context) => NewChatScreen(currentUserId : this.currentUserId)));
+  _goToNewChat() {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => NewChatScreen(currentUserDoc: this.currentUserDocument)));
   }
 
   Widget buildItem(BuildContext context, DocumentSnapshot document) {
@@ -253,7 +251,8 @@ class _MyHomePageState extends State<MyHomePage> {
       workInProgress = false;
     });
 
-    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => MyApp()), (Route<dynamic> route) => false);
+    Navigator.of(context).pushReplacementNamed('/mainscreen');
+    //Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => MyApp()), (Route<dynamic> route) => false);
   }
 }
 

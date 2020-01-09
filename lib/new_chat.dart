@@ -155,37 +155,91 @@ class NewChatScreenState extends State<NewChatScreen> {
     if (selectedUsers.length == 1) {
       DocumentSnapshot peerDoc = selectedUsers[0];
       currentUserDoc.reference.collection('chatHistory').getDocuments().then((documents) {
-        documents.documents.forEach((document) async {
-          if (document.data['chatDoc'].collection('users').document(peerDoc.documentID) != null)
+        bool found = false;
+        documents.documents.forEach((curDocument) {
+          if (curDocument.data['peerId'] == peerDoc.documentID)
           {
-            DocumentSnapshot ds = await document.data['chatDoc'].get();
+              curDocument.data['chatDoc'].get().then((ds) {
 
-            Navigator.pop(context);
-            Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage(chatDocument: ds, chatName: document.data['chatName'], currentUserDoc: currentUserDoc)));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage(chatDocument: ds, chatName: curDocument.data['chatName'], currentUserDoc: currentUserDoc)));
+            });
+            found = true;
             return;
           }
         });
-      });
+        if (!found)
+        {
+          Firestore.instance.collection('chats').add({
+            'isGroup': false
+          }).then((ref) {
+            ref.collection('users').document(currentUserDoc.documentID).setData({
+              'userId': currentUserDoc.documentID,
+              'userDoc': currentUserDoc.reference
+            });
+            ref.collection('users').document(peerDoc.documentID).setData({
+              'userId': peerDoc.documentID,
+              'userDoc': peerDoc.reference
+            });
 
-      DocumentReference ref = await Firestore.instance.collection('chats').add({
-        'isGroup': false
-      });
-      ref.collection('users').document(currentUserDoc.documentID).setData({
-        'userId': currentUserDoc.documentID,
-        'userDoc': currentUserDoc.reference
-      });
-      ref.collection('users').document(peerDoc.documentID).setData({
-        'userId': peerDoc.documentID,
-        'userDoc': peerDoc.reference
-      });
+            currentUserDoc.reference.collection('chatHistory').document(ref.documentID).setData({
+              'chatName': peerDoc.data['displayName'],
+              'chatDoc': ref,
+              'peerId': peerDoc.documentID
+            });
+            peerDoc.reference.collection('chatHistory').document(ref.documentID).setData({
+              'chatName': currentUserDoc.data['displayName'],
+              'chatDoc': ref,
+              'peerId': currentUserDoc.documentID
+            });
 
-
-      Navigator.pop(context);
-      Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage(chatDocument: ds, chatName: document.data['chatName'], currentUserDoc: currentUserDoc)));
+            ref.get().then((chatDoc) {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage(chatDocument: chatDoc, chatName: peerDoc.data['displatName'], currentUserDoc: currentUserDoc)));
+            });
+          });
+        }
+      });
     }
     else {
+      //TODO grupni chat
+
+      String thisChatName = '';
+      Firestore.instance.collection('chats').add({
+        'isGroup': true
+      }).then((ref) {
+        selectedUsers.add(currentUserDoc);
+        selectedUsers.forEach((user) {
+          ref.collection('users').document(user.documentID).setData({
+            'userId': user.documentID,
+            'userDoc': user.reference
+          });
+
+          String chatName = '';
+          selectedUsers.forEach((curUser) {
+            if (curUser.documentID != user.documentID) {
+              chatName += curUser.data['displayName'] + ', ';
+            }
+            if (user.documentID == currentUserDoc.documentID) {
+              if (curUser.documentID != currentUserDoc.documentID) {
+                thisChatName += curUser.data['displayName'] + ', ';
+              }
+
+            }
+          });
+          chatName = chatName.substring(0, chatName.length - 2);
+          user.reference.collection('chatHistory').document(ref.documentID).setData({
+            'chatName': chatName,
+            'chatDoc': ref
+          });
+        });
+
+        ref.get().then((chatDoc) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage(chatDocument: chatDoc, chatName: thisChatName, currentUserDoc: currentUserDoc)));
+        });
+      });
 
     }
+
+    Navigator.pop(context);
   }
 }
 

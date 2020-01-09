@@ -258,7 +258,7 @@ class MyCustomFormState extends State<RegistrationScreen> {
       this.workInProgress = false;
     });
     //Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage()));
-    Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage()));
+    Navigator.of(context).pushReplacementNamed('/mainscreen');
   }
   _goBack() async {
     //Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));

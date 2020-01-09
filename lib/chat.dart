@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'values/app_colors.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chatapp/values/app_colors.dart';
 
 class ChatPage extends StatefulWidget {
   ChatPage({Key key, @required this.chatDocument, @required this.currentUserDoc, @required this.chatName}) : super(key: key);
@@ -42,7 +43,7 @@ class ChatPageState extends State<ChatPage> {
   var listMessages;
   File imageFile;
   String imageUrl;
-  DocumentSnapshot groupSnapShot;
+  List<DocumentSnapshot> otherUsers;
 
   @override
   void initState() {
@@ -53,6 +54,22 @@ class ChatPageState extends State<ChatPage> {
       });
       debugPrint("current User Id is " + currentUserUid);
     });*/
+
+    loadUsers();
+  }
+
+  void loadUsers() async {
+    otherUsers = new List<DocumentSnapshot>();
+    chatDocument.reference.collection('users').getDocuments().then((docs) {
+      docs.documents.remove(currentUserDoc);
+      docs.documents.forEach((docRef) {
+        docRef.data['userDoc'].get().then((doc) {
+          this.setState(() {
+            otherUsers.add(doc);
+          });
+        });
+      });
+    });
   }
 
   @override
@@ -214,17 +231,29 @@ class ChatPageState extends State<ChatPage> {
   Widget buildItem(int index, DocumentSnapshot document) {
     if (document['idFrom'] == currentUserDoc.documentID) {
       // Right (my message)
-      return Row(
+      return Column(
+        children: <Widget>[
+          Container(
+            child: Row(
+              children: <Widget>[
+                Text(currentUserDoc == null ? 'loading' : currentUserDoc.data['displayName']),
+              ],
+              mainAxisAlignment: MainAxisAlignment.end,
+            ),
+            margin: EdgeInsets.only(left: 20.0, right: 20.0),
+          ),
+          Row(
         children: <Widget>[
           document['type'] == 0
           // Text
               ? Container(
             child: Text(
               document['content'],
+              style: TextStyle(color: Colors.white),
             ),
             padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
             width: 200.0,
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8.0)),
+            decoration: BoxDecoration(color: AppColors.APP_BAR_BACKGROUND_COLOR, borderRadius: BorderRadius.circular(8.0)),
             margin: EdgeInsets.only(bottom: 10.0, right: 10.0),
           )
               : Container(
@@ -268,15 +297,25 @@ class ChatPageState extends State<ChatPage> {
           )
         ],
         mainAxisAlignment: MainAxisAlignment.end,
-      );
+      )]);
     } else {
       // Left (peer message)
       return Container(
         child: Column(
           children: <Widget>[
+            Container(
+              child: Row(
+                children: <Widget>[
+                  Text(getDisplayName(document.data['idFrom'])),
+                      //otherUsers == null ? 'loading' : otherUsers.singleWhere((user) => user.documentID == document.data['idFrom']).data['displayName']),
+                  //Text('loading')
+                ],
+                mainAxisAlignment: MainAxisAlignment.start,
+              ),
+              margin: EdgeInsets.only(left: 20.0, right: 20.0),
+            ),
             Row(
               children: <Widget>[
-                Container(width: 35.0),
                 document['type'] == 0
                     ? Container(
                   child: Text(
@@ -285,11 +324,10 @@ class ChatPageState extends State<ChatPage> {
                   ),
                   padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
                   width: 200.0,
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(8.0)),
+                  decoration: BoxDecoration(color: AppColors.APP_BAR_BACKGROUND_COLOR, borderRadius: BorderRadius.circular(8.0)),
                   margin: EdgeInsets.only(left: 10.0),
                 )
-                    : document['type'] == 1
-                    ? Container(
+                    : Container(
                   child: Container(
                     child: Material(
                       child: CachedNetworkImage(
@@ -328,15 +366,6 @@ class ChatPageState extends State<ChatPage> {
                   ),
                   margin: EdgeInsets.only(left: 10.0),
                 )
-                    : Container(
-                  child: new Image.asset(
-                    'images/${document['content']}.gif',
-                    width: 100.0,
-                    height: 100.0,
-                    fit: BoxFit.cover,
-                  ),
-                  margin: EdgeInsets.only(bottom: 10.0, right: 10.0),
-                ),
               ],
             ),
           ],
@@ -345,6 +374,17 @@ class ChatPageState extends State<ChatPage> {
         margin: EdgeInsets.only(bottom: 10.0),
       );
     }
+  }
+
+  String getDisplayName(String id) {
+    if (otherUsers == null) {
+      return 'loading';
+    }
+    DocumentSnapshot ss = otherUsers.singleWhere((user) => user.documentID == id);
+    if (ss == null) {
+      return 'loading';
+    }
+    return ss.data['displayName'];
   }
 
   void onSendMessage(String content, int type) {

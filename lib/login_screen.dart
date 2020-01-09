@@ -2,6 +2,7 @@ import 'package:chatapp/main.dart';
 import 'package:chatapp/registration_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as prefix0;
 import 'package:flutter/services.dart';
 import 'services/app_settings.dart';
 //import 'services/http_services.dart';
@@ -227,7 +228,8 @@ class LoginScreenState extends State<LoginScreen> {
       this.workInProgress = false;
     });
 
-    Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage()));
+    Navigator.of(context).pushReplacementNamed('/mainscreen');
+    //Navigator.popUntil(context, ModalRoute.withName('/loginscreen'));
   }
 
   _goToRegistration() async {
